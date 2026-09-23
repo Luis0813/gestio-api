@@ -86,7 +86,8 @@ test:
 #
 production:
   primary: &primary_production
-    <<: *default
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
     database: china_fit_api_production
     username: china_fit_api
     password: <%= ENV["CHINA_FIT_API_DATABASE_PASSWORD"] %>
