@@ -32,6 +32,7 @@ class User < ApplicationRecord
   validates :role, presence: true, inclusion: { in: roles.keys }
   validates :company_name, presence: true, if: -> { role == "company" }
 
+  before_validation :initialize_jti, on: :create
   before_create :set_default_membership_expiration
 
   def active_for_authentication?
@@ -45,6 +46,10 @@ class User < ApplicationRecord
   end
 
   private
+
+  def initialize_jti
+    self.jti ||= SecureRandom.uuid
+  end
 
   def set_default_membership_expiration
     if company? && membership_expires_at.nil?

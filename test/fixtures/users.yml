@@ -1,25 +1,16 @@
-# == Schema Information
-#
-# Table name: users
-#
-#  id                     :bigint           not null, primary key
-#  email                  :string           default(""), not null
-#  encrypted_password     :string           default(""), not null
-#  reset_password_token   :string
-#  reset_password_sent_at :datetime
-#  remember_created_at    :datetime
-#  role                   :string           default("client"), not null
-#  jti                    :string           not null
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#
+# Test fixtures for Users
+one:
+  email: one@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
+  role: admin
+  jti: <%= SecureRandom.uuid %>
+  active: true
 
-# This model initially had no columns defined. If you add columns to the
-# model remove the "{}" from the fixture names and add the columns immediately
-# below each fixture, per the syntax in the comments below
-#
-one: {}
-# column: value
-#
-two: {}
-# column: value
+two:
+  email: two@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password123') %>
+  role: company
+  company_name: Empresa Fixture
+  jti: <%= SecureRandom.uuid %>
+  active: true
+  membership_expires_at: <%= 1.month.from_now.to_fs(:db) %>
