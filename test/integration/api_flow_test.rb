@@ -44,7 +44,6 @@ class ApiFlowTest < ActionDispatch::IntegrationTest
         email: "new_company@gestio.com",
         password: "password123",
         password_confirmation: "password123",
-        role: "company",
         company_name: "Ferreteria Don Pedro"
       }
     }, as: :json
@@ -52,7 +51,25 @@ class ApiFlowTest < ActionDispatch::IntegrationTest
     assert_response :success
     json = JSON.parse(response.body)
     assert_equal "new_company@gestio.com", json["data"]["email"]
+    assert_equal "company", json["data"]["role"]
     assert_not_nil response.headers["Authorization"]
+  end
+
+  # Edge Case: Public signup attempts to set role: admin are forced to role: company
+  test "public signup cannot create admin role and is forced to company" do
+    post "/signup", params: {
+      user: {
+        email: "hacker_admin@gestio.com",
+        password: "password123",
+        password_confirmation: "password123",
+        role: "admin",
+        company_name: "Empresa Infiltrada"
+      }
+    }, as: :json
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "company", json["data"]["role"]
   end
 
   test "user can login and fetch current user profile" do
@@ -164,9 +181,21 @@ class ApiFlowTest < ActionDispatch::IntegrationTest
       user: {
         email: "nocompanyname@gestio.com",
         password: "password123",
-        password_confirmation: "password123",
-        role: "company"
+        password_confirmation: "password123"
         # company_name omitted
+      }
+    }, as: :json
+
+    assert_response :unprocessable_entity
+  end
+
+  test "rejects signup with short password under 6 chars" do
+    post "/signup", params: {
+      user: {
+        email: "shortpass@gestio.com",
+        password: "123",
+        password_confirmation: "123",
+        company_name: "Empresa Corta"
       }
     }, as: :json
 
@@ -179,7 +208,6 @@ class ApiFlowTest < ActionDispatch::IntegrationTest
         email: "company_test@gestio.com",
         password: "password123",
         password_confirmation: "password123",
-        role: "company",
         company_name: "Otra Empresa"
       }
     }, as: :json
