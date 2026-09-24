@@ -9,7 +9,8 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins '*', 'https://gestio-page.vercel.app'
+    # Permite peticiones desde localhost, dominios exactos y subdominios *.vercel.app
+    origins '*', /https:\/\/.*\.vercel\.app/
 
     resource '*',
       headers: :any,
