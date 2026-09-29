@@ -21,6 +21,13 @@ class User < ApplicationRecord
 
   audited
 
+  has_many :products, dependent: :destroy
+  has_many :raw_materials, dependent: :destroy
+  has_many :expenses, dependent: :destroy
+  has_many :payroll_entries, dependent: :destroy
+  has_many :customers, dependent: :destroy
+  has_many :stock_movements, dependent: :destroy
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
