@@ -12,16 +12,24 @@
 #
 #   CORS_ALLOWED_ORIGINS=https://app.vercel.app,https://mitienda.com
 #
-# Si la variable NO está definida se cae a los valores por defecto de desarrollo
-# (localhost). Nunca se usa "*": combinado con `credentials` o sin validación de
-# origen, permitiría que cualquier sitio reutilice la API.
-default_origins = [ "http://localhost:5173", "http://localhost:3000" ]
+# Si la variable NO está definida se cae a los valores por defecto, que incluyen
+# SIEMPRE el frontend de producción. Esto evita que un redeploy sin la variable
+# configurada en el hosting rompa el login con "No 'Access-Control-Allow-Origin'
+# header is present".
+#
+# Nunca se usa "*": combinado con `credentials` o sin validación de origen,
+# permitiría que cualquier sitio reutilice la API.
+default_origins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://gestio-page.vercel.app"
+]
 
-allowed_origins = if (env = ENV["CORS_ALLOWED_ORIGINS"].presence)
-  env.split(",").map(&:strip).reject(&:blank?)
-else
-  default_origins
-end
+# La variable de entorno SUMA a los defaults, no los reemplaza. Así una variable
+# mal escrita nunca deja fuera al frontend de producción ni a localhost.
+env_origins = ENV["CORS_ALLOWED_ORIGINS"].to_s.split(",").map(&:strip).reject(&:blank?)
+
+allowed_origins = (default_origins + env_origins).uniq
 
 # Previews de Vercel sólo en desarrollo, para no abrir producción.
 vercel_preview = if Rails.env.development?
